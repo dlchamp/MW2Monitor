@@ -139,6 +139,11 @@ class Commands(commands.Cog):
         if player is None:
             player = data.Player(_id=inter.author.id, is_active=False, times=[])
 
+        if player.is_active:
+            return await inter.response.send_message(
+                "You cannot manually add a session while you have an active session", ephemeral=True
+            )
+
         player.add_session(datetime.timestamp(started_at), datetime.timestamp(now))
 
         # store the updated player in json
