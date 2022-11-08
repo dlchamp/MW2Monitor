@@ -34,7 +34,14 @@ class Presence(commands.Cog):
             activity = [a for a in after.activities if name in a.name][0]
             start_time = datetime.timestamp(activity.start)
 
-            data.log_start_time(after.id, start_time)
+            player = data.load_player(after.member.id)
+
+            if player is None:
+                player = data.Player(_id=after.member.id, is_active=True, times=[])
+
+            player.add_start_time(start_time)
+            data.update_player(player)
+
             logger.info(f"{after.display_name} started paying COD at {activity.start} UTC")
             return
 
@@ -44,7 +51,17 @@ class Presence(commands.Cog):
         ):
 
             end_time = datetime.timestamp(disnake.utils.utcnow())
-            data.log_end_time(after.id, end_time)
+
+            player = data.load_player(after.member.id)
+
+            if player is None:
+                # player doesn't exist and has no start time, so we'll just return
+                # until they start a new session and are added to the json data
+                return
+
+            player.add_end_time(end_time)
+            data.update_player(player)
+
             logger.info(
                 f"{after.display_name} has stopped playing COD at {disnake.utils.utcnow()} UTC"
             )
