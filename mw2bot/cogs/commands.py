@@ -124,6 +124,13 @@ class Commands(commands.Cog):
         minutes: :type:`Optional[int]`
             How many minutes was your session? (Default 0)
         """
+
+        if hours == 0 and minutes == 0:
+            return await inter.response.send_message(
+                "Error: Please include hours and/or minutes when running this command.",
+                ephemeral=True,
+            )
+
         player = data.load_player(inter.author.id)
 
         now = disnake.utils.utcnow()
